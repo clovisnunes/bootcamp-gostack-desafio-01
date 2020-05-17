@@ -3,8 +3,26 @@ var app = express();
 
 app.use(express.json());
 
+var totalReqs = 0;
 var projects = [];
 projects.push({id: '1', title: 'Title 1', tasks: []}, {id: '2', title: 'Title 2', tasks: []});
+
+app.use(function(req, res, next) {
+    console.log('Total de requisições: ' + ++totalReqs);
+    next();
+});
+
+app.use('/projects/:id', function(req, res, next) {
+    // check if id exists on projects
+    var idcheck = projects.filter(element => element["id"] == req.params.id);
+    if(idcheck == 0) {
+        // error
+        res.status(404).send('Id does not exist');
+    } else {
+        next();
+    }
+    
+});
 
 app.get('/', function(req, res) {
     res.send('Get request');
